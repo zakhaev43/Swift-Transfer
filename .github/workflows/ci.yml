@@ -19,7 +19,7 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_USER: root
-          POSTGRES_PASSWORD: 123
+          POSTGRES_PASSWORD: secret
           POSTGRES_DB: simple_bank
         # Set health checks to wait until postgres has started
         options: >-
@@ -29,7 +29,7 @@ jobs:
           --health-retries 5
         ports:
           # Maps tcp port 5432 on service container to the host
-          - 5400:5432
+          - 5432:5432
     steps:
     - uses: actions/checkout@v4
 
