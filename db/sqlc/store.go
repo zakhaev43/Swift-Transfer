@@ -6,13 +6,16 @@ import (
 	"fmt"
 )
 
-// Store defines all functions to execute db queries and transactions
+// Store interface defines all functions to execute db queries and transactions
 type Store interface {
 	Querier
 	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
 }
 
 // SQLStore provides all functions to execute SQL queries and transactions
+// The Store interface embeds the Querier interface,
+// meaning it inherits all the methods defined in Querier. This allowed Store to compose multiple interfaces together,
+// providing a more comprehensive set of methods
 type SQLStore struct {
 	db *sql.DB
 	*Queries
@@ -27,12 +30,14 @@ func NewStore(db *sql.DB) Store {
 }
 
 // ExecTx executes a function within a database transaction
+// So it require context and a callback function
 func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
+	// Now call New function to get query object
 	q := New(tx)
 	err = fn(q)
 	if err != nil {
