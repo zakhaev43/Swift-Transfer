@@ -116,9 +116,45 @@ func (server *Server) deleteAccount(ctx *gin.Context) {
 		return
 	}
 
-	 // Return the response with the deleted account ID as a single string
-	 ctx.JSON(http.StatusOK, gin.H{
-        "status": fmt.Sprintf("account %d is deleted", req.ID),
-    })
+	// Return the response with the deleted account ID as a single string
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": fmt.Sprintf("account %d is deleted", req.ID),
+	})
+
+}
+
+// Update Account block
+type updateAccountRequest struct {
+	ID      int64 `form:"id" binding:"required,min=1,gt=0"`
+	Balance int64 `form:"balance" binding:"required,gt=0"`
+}
+
+// Update Account api
+func (server *Server) updateAccount(ctx *gin.Context) {
+	var req updateAccountRequest
+
+	// Bind and validate URI parameters
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// prepare payload
+	arg := db.UpdateAccountParams{
+
+		ID:      req.ID,
+		Balance: req.Balance,
+	}
+
+	// Perform the balance update operation
+	account, err := server.store.UpdateAccount(ctx, arg)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return the response with the updated account ID as a single string
+	ctx.JSON(http.StatusOK, account)
 
 }
