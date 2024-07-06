@@ -123,7 +123,7 @@ func (server *Server) deleteAccount(ctx *gin.Context) {
 
 }
 
-// Update Account block
+// Update Account code block
 type updateAccountRequest struct {
 	ID      int64 `form:"id" binding:"required,min=1,gt=0"`
 	Balance int64 `form:"balance" binding:"required,gt=0"`
