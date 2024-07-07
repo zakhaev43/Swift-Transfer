@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 	db "github.com/zakhaev43/Simple-Bank/db/sqlc"
 )
 
@@ -19,7 +20,13 @@ func (server *Server) createAccount(ctx *gin.Context) {
 	var req createAccountRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+
+		pqErr, ok := err.(*pq.Error)
+		if ok {
+
+			ctx.JSON(http.StatusForbidden, errorResponse(pqErr))
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 
 		return
 	}
