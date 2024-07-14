@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -25,6 +26,7 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
+	fmt.Printf("The length of TokenSymmetricKey is: %d\n", len(config.TokenSymmetricKey))
 	server, err := api.NewServer(config, store)
 
 	if err != nil {

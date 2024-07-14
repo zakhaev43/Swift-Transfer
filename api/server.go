@@ -21,6 +21,8 @@ type Server struct {
 func NewServer(config util.Config, store db.Store) (*Server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	fmt.Printf("The length of TokenSymmetricKey is: %d\n", len(config.TokenSymmetricKey))
+
 	if err != nil {
 		return nil, fmt.Errorf("cant create token matter\n%w", err)
 	}
