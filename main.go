@@ -6,9 +6,9 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/zakhaev43/Simple-Bank/api"
-	db "github.com/zakhaev43/Simple-Bank/db/sqlc"
-	"github.com/zakhaev43/Simple-Bank/util"
+	"github.com/zakhaev43/Swift-Transfer/api"
+	db "github.com/zakhaev43/Swift-Transfer/db/sqlc"
+	"github.com/zakhaev43/Swift-Transfer/util"
 )
 
 func main() {
@@ -25,7 +25,11 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
+	server, err := api.NewServer(config, store)
+
+	if err != nil {
+		log.Fatal("cant not create server\n", err)
+	}
 
 	err = server.Start(config.ServerAddress)
 
