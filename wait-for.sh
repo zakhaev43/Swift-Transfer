@@ -25,7 +25,7 @@
 VERSION="2.2.4"
 
 set -- "$@" -- "$TIMEOUT" "$QUIET" "$PROTOCOL" "$HOST" "$PORT" "$result"
-TIMEOUT=150
+TIMEOUT=15
 QUIET=0
 # The protocol to make the request with, either "tcp" or "http"
 PROTOCOL="tcp"
