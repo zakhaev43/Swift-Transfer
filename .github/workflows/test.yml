@@ -2,7 +2,7 @@ name: Swift_CI
 
 on:
   push:
-    branches: [ "main","ci_test"  ]
+    branches: [ "main","ci_test"]
   pull_request:
     branches: [ "main" ]
 
@@ -37,12 +37,6 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21.4'
-    - name: Wait for PostgreSQL to be ready
-      run: |
-          until pg_isready -h postgres -p 5432; do
-            echo "Waiting for PostgreSQL..."
-            sleep 20
-          done
 
     - name: Install golang-migrate
       run: |
