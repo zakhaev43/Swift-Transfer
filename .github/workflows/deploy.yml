@@ -3,12 +3,10 @@ name: Deploy to Production
 on:
   push:
     branches: [ "main", "cd_test" ]
-  
-
 permissions:
   id-token: write
   contents: read
-  
+
 jobs:
 
   build:
