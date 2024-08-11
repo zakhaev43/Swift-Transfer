@@ -2,23 +2,22 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ "main" ]
-  
-
+    branches: [ "main", "cd_test" ]
+permissions:
+  id-token: write
+  contents: read
 jobs:
 
   build:
     runs-on: ubuntu-latest
    
-    
-    
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ secrets.AWS_ROLE }}
+        role-to-assume: arn:aws:iam::014498645169:role/cd_github
         aws-region: eu-central-1
 
     - name: Login to Amazon ECR Private
