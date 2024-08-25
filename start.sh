@@ -3,7 +3,7 @@
 set -e
 
 echo "run db migration"
-. /app/app.env
+source /app/app.env
 
 # Debugging: Print environment variables
 echo "DB_DRIVER: $DB_DRIVER"
