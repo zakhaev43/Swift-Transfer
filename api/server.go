@@ -56,9 +56,17 @@ func (server *Server) setUpRouter() {
 	//They dont require auth middleware
 	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
+	// Health check route (public, no auth required)
+	router.GET("/health", server.HealthCheck)
 
 	server.router = router
 
+}
+
+func (server *Server) HealthCheck(ctx *gin.Context) {
+	ctx.JSON(200, gin.H{
+		"status": "healthy",
+	})
 }
 
 func (server *Server) Start(address string) error {
