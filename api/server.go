@@ -56,6 +56,7 @@ func (server *Server) setUpRouter() {
 	//They dont require auth middleware
 	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
+	router.POST("/tokens/renew_access", server.renewAccessToken)
 	// Health check route (public, no auth required)
 	router.GET("/health", server.HealthCheck)
 
