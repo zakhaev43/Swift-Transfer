@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: my-go-app:latest  
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_SOURCE
+          value: "postgresql://root:secret@postgres:5432/swift_transfer?sslmode=disable"
+        command: [ "/app/main" ]
+        lifecycle:
+          postStart:
+            exec:
+              command: [ "/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh" ]
