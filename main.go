@@ -7,6 +7,9 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/zakhaev43/Swift-Transfer/api"
 	db "github.com/zakhaev43/Swift-Transfer/db/sqlc"
 	"github.com/zakhaev43/Swift-Transfer/util"
@@ -32,11 +35,29 @@ func main() {
 	if err != nil {
 		log.Fatal("cant not create server\n", err)
 	}
-
+	//run migration
+	runDBMigration(config.MigrationURL, config.DBSource)
 	err = server.Start(config.ServerAddress)
 
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
+
+}
+
+func runDBMigration(migrationURL string, dbSource string) {
+
+	migration, err := migrate.New(migrationURL, dbSource)
+	if err != nil {
+		log.Fatal("could not create new migration instance:", err)
+	}
+
+	err = migration.Up()
+
+	if err != nil {
+		log.Fatal("failed to run migrate up:", err)
+	}
+
+	log.Println("db migrtaed successfully")
 
 }
