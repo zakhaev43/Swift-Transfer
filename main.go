@@ -54,8 +54,8 @@ func runDBMigration(migrationURL string, dbSource string) {
 
 	err = migration.Up()
 
-	if err != nil {
-		log.Fatal("failed to run migrate up:", err)
+	if err != nil && err != migrate.ErrNoChange {
+		log.Fatalf("Migration failed: %v", err)
 	}
 
 	log.Println("db migrtaed successfully")
