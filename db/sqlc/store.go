@@ -6,6 +6,12 @@ import (
 	"fmt"
 )
 
+// Define transaction options
+var txOptions = &sql.TxOptions{
+	Isolation: sql.LevelSerializable,
+	ReadOnly:  false,
+}
+
 // Store interface defines all functions to execute db queries and transactions
 type Store interface {
 	Querier
@@ -32,7 +38,7 @@ func NewStore(db *sql.DB) Store {
 // ExecTx executes a function within a database transaction
 // So it require context and a callback function
 func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.db.BeginTx(ctx, nil)
+	tx, err := store.db.BeginTx(ctx, txOptions)
 	if err != nil {
 		return err
 	}
