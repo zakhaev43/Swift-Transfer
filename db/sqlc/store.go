@@ -4,13 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-)
 
-// Define transaction options
-var txOptions = &sql.TxOptions{
-	Isolation: sql.LevelSerializable,
-	ReadOnly:  false,
-}
+	"github.com/lib/pq"
+)
 
 // Store interface defines all functions to execute db queries and transactions
 type Store interface {
@@ -38,22 +34,35 @@ func NewStore(db *sql.DB) Store {
 // ExecTx executes a function within a database transaction
 // So it require context and a callback function
 func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.db.BeginTx(ctx, txOptions)
-	if err != nil {
-		return err
-	}
-
-	// Now call New function to get query object
-	q := New(tx)
-	err = fn(q)
-	if err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("tx err: %v, rb err: %v", err, rbErr)
+	const maxRetries = 3
+	for i := 0; i < maxRetries; i++ {
+		tx, err := store.db.BeginTx(ctx, &sql.TxOptions{
+			Isolation: sql.LevelSerializable,
+		})
+		if err != nil {
+			return err
 		}
-		return err
-	}
 
-	return tx.Commit()
+		q := New(tx)
+		err = fn(q)
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				return fmt.Errorf("tx err: %v, rb err: %v", err, rbErr)
+			}
+
+			// Check if the error is related to serialization failure
+			if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "40001" { // PostgreSQL serialization error code
+				continue // Retry the transaction
+			}
+			return err
+		}
+
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+		return nil
+	}
+	return fmt.Errorf("transaction failed after %d retries", maxRetries)
 }
 
 // TransferTxParams contains the input parameters of the transfer transaction
